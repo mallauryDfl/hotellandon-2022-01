@@ -61,14 +61,14 @@ namespace HotelLandon.DemoEfCore
             //     context.SaveChanges();
             // }
             RepositoryBase<Customer> customersRepository = new RepositoryBase<Customer>();
-            customersRepository.Add(customer);
+            customersRepository.AddAsync(customer);
 
             RepositoryBase<Room> roomsRepository = new RepositoryBase<Room>();
-            if (!roomsRepository.GetAll().Any())
+            if (!roomsRepository.GetAllAsync().Any())
             {
                 for (int i = 1; i < 10; i++)
                 {
-                    roomsRepository.Add(new Room{ Number = i, Floor = 0 });
+                    roomsRepository.AddAsync(new Room{ Number = i, Floor = 0 });
                 }
             }
         }

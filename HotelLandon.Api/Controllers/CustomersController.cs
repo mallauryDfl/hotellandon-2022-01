@@ -1,11 +1,10 @@
-using HotelLandon.Models;
-using HotelLandon.Repository;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc;
+using HotelLandon.Repository;
+using HotelLandon.Models;
 using System.Threading.Tasks;
-using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
-namespace HotelLandon.Api.Controllers
+namespace HotelLandon.MvcRazor.Controllers
 {
     public class CustomersController : GenericController<IRepositoryBase<Customer>, Customer>
     {
@@ -15,21 +14,16 @@ namespace HotelLandon.Api.Controllers
         {
         }
 
-        [HttpPost("[action]")]
-        public async Task AddData()
-        {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < 500; i++)
-            {    
-                await this.repository.AddAsync(new Customer
-                {
-                    FirstName = "A",
-                    LastName = "B",
-                    BirthDate = default
-                });
-            }
-            logger.LogInformation("Add data: {ms}ms", sw.ElapsedMilliseconds);
-        }
+        public override Task<ActionResult<Customer>> Create([Bind(new[] {
+            nameof(Customer.Id),
+            nameof(Customer.FirstName),
+            nameof(Customer.LastName),
+            nameof(Customer.BirthDate) })] Customer entity) => base.Create(entity);
+
+        public override Task<IActionResult> Edit([Bind(new[] {
+            nameof(Customer.Id),
+            nameof(Customer.FirstName),
+            nameof(Customer.LastName),
+            nameof(Customer.BirthDate) })] Customer entity, int id) => base.Edit(entity, id);
     }
 }

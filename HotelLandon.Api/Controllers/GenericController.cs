@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using HotelLandon.Models;
 using HotelLandon.Repository;
-using System.Diagnostics;
+using HotelLandon.Models;
 
-namespace HotelLandon.Api.Controllers
+namespace HotelLandon.MvcRazor.Controllers
 {
-    [ApiController, Route("[controller]")]
-    public abstract class GenericController<TRepository, TEntity> : ControllerBase
+    public abstract class GenericController<TRepository, TEntity> : Controller
         where TRepository : IRepositoryBase<TEntity>
         where TEntity : EntityBase
     {
@@ -26,60 +25,101 @@ namespace HotelLandon.Api.Controllers
             this.logger = logger;
         }
 
-        [HttpGet]
-        public async Task<IEnumerable<TEntity>> Get()
+        public async Task<IActionResult> Index()
         {
-            await Task.Delay(0);
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             IEnumerable<TEntity> items = await this.repository.GetAllAsync();
             logger.LogInformation("{ms}ms", sw.ElapsedMilliseconds);
-            return items;
+            return View(items);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TEntity>> GetById(int id)
+        // .com/customers/details/id
+        [HttpGet("[action]/{id}")]
+        public virtual async Task<IActionResult> Details(int id)
         {
             TEntity entity = await this.repository.GetAsync(id);
             if (entity == null)
             {
-                return NotFound();
+                return View("NotFound");
             }
-            return Ok(entity);
+            return View(entity);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<TEntity>> Create(TEntity entity)
+        [HttpGet("[action]")]
+        public virtual IActionResult Create() => View(default(TEntity));
+
+        [HttpPost("[action]")]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<ActionResult<TEntity>> Create([Bind("Id")] TEntity entity)
         {
-            if (await this.repository.AddAsync(entity))
+            if (ModelState.IsValid)
             {
-                return Created("Ok", entity);
+                if (await this.repository.AddAsync(entity))
+                {
+                    return RedirectToAction(nameof(Index));
+                }
             }
-            return NoContent();
+            return View(entity);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Update(TEntity entity, int id)
+        [HttpGet("[action]/{id?}")]
+        public virtual async Task<IActionResult> Edit(int? id)
+        {
+            if (id is null)
+            {
+                return View("NotFound");
+            }
+            var entity = await this.repository.GetAsync(id.Value);
+            if (entity == null)
+            {
+                return View("NotFound");
+            }
+            return View(entity);
+        }
+
+        [HttpPost("[action]/{id?}")]
+        [ValidateAntiForgeryToken]
+        public virtual async Task<IActionResult> Edit([Bind("Id")] TEntity entity, int id)
         {
             if (!entity.Id.Equals(id))
             {
-                return BadRequest("Les ids ne correspondent pas");
+                return View("NotFound");
             }
-            if (await this.repository.UpdateAsync(entity, id))
+            if (ModelState.IsValid)
             {
-                return NoContent();
+                if (await this.repository.UpdateAsync(entity, id))
+                {
+                    return RedirectToAction(nameof(Details), new { id });
+                }
             }
-            return StatusCode(406);
+            return View(entity);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id is null)
+            {
+                return View("NotFound");
+            }
+            TEntity entity = await this.repository.GetAsync(id.Value);
+            if (entity is null)
+            {
+                return View("NotFound");
+            }
+            return View(entity);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCompleted(int id)
         {
             if (await this.repository.DeleteAsync(id))
             {
-                return NoContent();
+                return View(true);
             }
-            return Ok(true);
+            return View(false);
         }
     }
 }
