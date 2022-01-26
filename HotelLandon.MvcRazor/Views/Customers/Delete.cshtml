@@ -1,15 +1,34 @@
-﻿@*Delete customer*@
-@model Customer
+﻿@page
+@model HotelLandon.MvcRazor.Pages.Rooms.DeleteModel
 
 @{
-    ViewData["Title"] = "Are you sure to delete ?";
+    ViewData["Title"] = "Delete";
 }
-<form method="post" asp-action="DeleteCompleted">
 
-    <div>Supprimer le client suivant ?</div>
-    <div>@Model.FirstName</div>
-    <div>@Model.LastName</div>
-    <div>@Model.BirthDate</div>
+<h1>Delete</h1>
 
-    <button type="submit">Supprimer</button>
-</form>
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Room</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Room.Number)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Room.Number)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Room.Floor)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Room.Floor)
+        </dd>
+    </dl>
+
+    <form method="post">
+        <input type="hidden" asp-for="Room.Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
+</div>
