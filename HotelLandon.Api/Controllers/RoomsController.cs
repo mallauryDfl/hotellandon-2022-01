@@ -1,4 +1,5 @@
 using HotelLandon.Models;
+using HotelLandon.MvcRazor.Controllers;
 using HotelLandon.Repository;
 using Microsoft.Extensions.Logging;
 

@@ -60,7 +60,7 @@ namespace HotelLandon.DemoEfCore
             //     }
             //     context.SaveChanges();
             // }
-            RepositoryBase<Customer> customersRepository = new RepositoryBase<Customer>();
+            /*RepositoryBase<Customer> customersRepository = new RepositoryBase<Customer>();
             customersRepository.AddAsync(customer);
 
             RepositoryBase<Room> roomsRepository = new RepositoryBase<Room>();
@@ -70,7 +70,7 @@ namespace HotelLandon.DemoEfCore
                 {
                     roomsRepository.AddAsync(new Room{ Number = i, Floor = 0 });
                 }
-            }
+            }*/
         }
     }
 }
